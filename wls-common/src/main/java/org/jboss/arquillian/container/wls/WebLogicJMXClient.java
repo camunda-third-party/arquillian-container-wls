@@ -211,13 +211,16 @@ public class WebLogicJMXClient {
 
     private void doDeploy(String deploymentName, File deploymentArchive) throws DeploymentException {
         try {
+            String serverName = configuration.getTarget();
+            String[] targets = new String[]{serverName};
+
             ObjectName domainRuntime = (ObjectName) connection.getAttribute(domainRuntimeService, "DomainRuntime");
             ObjectName deploymentManager = (ObjectName) connection.getAttribute(domainRuntime, "DeploymentManager");
 
             ObjectName deploymentProgressObject = (ObjectName) connection.invoke(
                 deploymentManager, "deploy",
-                new Object[] {deploymentName, deploymentArchive.getAbsolutePath(), null},
-                new String[] {String.class.getName(), String.class.getName(), String.class.getName()}
+                new Object[] {deploymentName, deploymentArchive.getAbsolutePath(), targets, null, new java.util.Properties()},
+                new String[] {String.class.getName(), String.class.getName(), String[].class.getName(), String.class.getName(), java.util.Properties.class.getName()}
             );
 
             processDeploymentProgress(deploymentName, deploymentManager, deploymentProgressObject);
